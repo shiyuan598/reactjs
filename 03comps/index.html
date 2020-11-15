@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/prop-types/15.7.2/prop-types.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+        <title>reactjs</title>
+    </head>
+    <body>
+        <div id="container"></div>
+    </body>
+    <script type="text/babel">
+        class App extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    todoList: ['吃饭', '睡觉', '打豆豆'],
+                };
+                // 所有的方法都应该绑定this
+                this.addToDo = this.addToDo.bind(this);
+            }
+            addToDo(value) {
+                this.state.todoList.unshift(value);
+                // 改变state后必须再调用setState方法才能更新显示
+                this.setState({
+                    todoList: this.state.todoList,
+                });
+            }
+            render() {
+                return (
+                    <div>
+                        ToDo List
+                        <Add
+                            count={this.state.todoList.length}
+                            addToDo={this.addToDo}
+                        />
+                        <ToDos todoList={this.state.todoList} />
+                    </div>
+                );
+            }
+        }
+
+        class Add extends React.Component {
+            constructor(props) {
+                super(props);
+                this.handleAdd = this.handleAdd.bind(this);
+            }
+            handleAdd() {
+                const value = this.input.value; // 箭头函数声明的ref这样访问
+                this.props.addToDo(value); // 子组件不能改变父级的state,只能先通过props接收父级的方法，然后调用父级方法改变父级state
+                this.input.value = '';
+            }
+            render() {
+                const count = this.props.count + 1;
+                return (
+                    <div>
+                        <input type="text" ref={(dom) => (this.input = dom)} />
+                        <button onClick={this.handleAdd}>add #{count}</button>
+                    </div>
+                );
+            }
+        }
+        // 对props进行说明
+        Add.propTypes = {
+            count: PropTypes.number.isRequired,
+            addToDo: PropTypes.func.isRequired,
+        };
+
+        class ToDos extends React.Component {
+            constructor(props) {
+                super(props);
+            }
+            render() {
+                return (
+                    <ul>
+                        {this.props.todoList.map((todo, index) => {
+                            return <li key={index}>{todo}</li>;
+                        })}
+                    </ul>
+                );
+            }
+        }
+        ToDos.propTypes = {
+            todoList: PropTypes.array.isRequired,
+        };
+
+        ReactDOM.render(<App />, document.getElementById('container'));
+    </script>
+</html>
