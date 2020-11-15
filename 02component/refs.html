@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <title>reactjs</title>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="container2"></div>
+  </body>
+  <script type="text/babel">
+    // 1. 定义组件
+    class MyComponent extends React.Component {
+      constructor(props) {
+        super(props);
+        this.showInput = this.showInput.bind(this);
+        this.handleBlur = this.handleBlur.bind(this);
+      }
+      showInput() {
+        console.info(this.refs.input1.value);
+
+        const input2 = this.input2;
+        console.info(input2.value);
+
+      }
+      handleBlur(event) {
+        console.info(event.target.value);
+      }
+      render() {
+        // ref的两种写法
+        return (
+          <div>
+            <input type="text" ref="input1" />
+            <input type="text" ref={(dom) => (this.input2 = dom)} />
+            <button onClick={this.showInput}>提示输入</button>
+            <input
+              type="text"
+              placeholder="失去焦点提示内容"
+              onBlur={this.handleBlur}
+            />
+          </div>
+        );
+      }
+    }
+    // 2. 渲染组件标签
+    ReactDOM.render(<MyComponent />, document.getElementById("container"));
+  </script>
+</html>
