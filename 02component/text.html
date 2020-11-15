@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <title>reactjs</title>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="container2"></div>
+  </body>
+  <script type="text/babel">
+    // 1.定义组件
+    // 方式1 工厂函数组件
+    function MyComponent() {
+      return <h2>工厂函数创建简单的组件</h2>;
+    }
+
+    //方式2 ES6类组件
+    class MyComponent2 extends React.Component {
+      render() {
+        return <h2>ES6类创建的组件</h2>;
+      }
+    }
+    // 2.渲染标签组件
+    ReactDOM.render(<MyComponent />, document.getElementById("container"));
+    ReactDOM.render(<MyComponent2 />, document.getElementById("container2"));
+  </script>
+</html>
