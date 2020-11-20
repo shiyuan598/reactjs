@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基础图形编辑</title>
+    <link rel="stylesheet" href="https://minedata.cn/api/static/demo/javascript-3d-api/zh/css/demo.css">
+    <link rel="stylesheet" href="https://minedata.cn/api/static/demo/javascript-3d-api/zh/css/iconfont/iconfont.css">
+    <script src="https://minedata.cn/api/static/demo/javascript-3d-api/zh/js/demo.js"></script>
+    <!-- 引入MineMap API插件 -->
+    <link rel="stylesheet" href="https://minedata.cn/minemapapi/v3.2.0/minemap.css">
+    <script src="https://minedata.cn/minemapapi/v3.2.0/minemap.js"></script>
+    <link rel="stylesheet" href="https://minedata.cn/minemapapi/v2.1.0/plugins/edit/minemap-edit.css"/>
+    <script src="https://minedata.cn/minemapapi/v2.1.0/plugins/edit/minemap-edit.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .edit-ctrl-group {
+            position: absolute;
+            z-index: 300;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            overflow: hidden;
+        }
+
+        .edit-btn {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            font-size: 14px;
+            vertical-align: middle;
+            text-align: center;
+            cursor: pointer;
+            color: #111;
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #efefef;
+        }
+
+        .edit-doc-box {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            padding: 15px;
+            height: 200px;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .edit-doc-box .doc-header {
+            line-height: 24px;
+            vertical-align: middle;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .edit-doc-box .doc-title {
+            line-height: 24px;
+            vertical-align: middle;
+            font-size: 14px;
+            color: #eeeeee;
+        }
+
+        .edit-doc-box .doc-desc {
+            line-height: 20px;
+            vertical-align: middle;
+            font-size: 12px;
+            color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+<div id="map">
+    <div class="edit-ctrl-group" style="right: 74px;">
+        <div class="edit-btn" title="画点" onclick="onEditBtnClick('point')"><span
+                class="iconfont icon-draw-point"/></div>
+        <div class="edit-btn" title="删除所选" onclick="onEditBtnClick('trash')"><span
+                class="iconfont icon-tool-delete"/></div>
+        <div class="edit-btn" title="撤销上一步操作" onclick="onEditBtnClick('undo')"><span
+                class="iconfont icon-undo"/></div>
+        <div class="edit-btn" title="重复上一步操作" onclick="onEditBtnClick('redo')"><span
+                class="iconfont icon-redo"/></div>
+    </div>
+    <div class="edit-ctrl-group" style="right: 42px;">
+        <div class="edit-btn" title="画线" onclick="onEditBtnClick('line')"><span
+                class="iconfont icon-draw-line"/></div>
+        <div class="edit-btn" title="画圆弧" onclick="onEditBtnClick('arc')"><span
+                class="iconfont icon-draw-curve"/></div>
+        <div class="edit-btn" title="合并线" onclick="onEditBtnClick('union_line')"><span
+                class="iconfont icon-line-combine"/></div>
+        <div class="edit-btn" title="拆分线" onclick="onEditBtnClick('split_line')"><span
+                class="iconfont icon-line-split"/></div>
+        <div class="edit-btn" title="弯曲线" onclick="onEditBtnClick('curve_line')"><span
+                class="iconfont icon-draw-curve"/></div>
+        <div class="edit-btn" title="画草图" onclick="onEditBtnClick('free_drawing')"><span
+                class="iconfont icon-code-302"/></div>
+        <div class="edit-btn" title="合并同类图形" onclick="onEditBtnClick('combine')"><span
+                class="iconfont icon-shape-combine"/></div>
+        <div class="edit-btn" title="拆分同类图形" onclick="onEditBtnClick('uncombine')"><span
+                class="iconfont icon-shape-split"/></div>
+    </div>
+    <div class="edit-ctrl-group">
+        <div class="edit-btn" title="画多边形" onclick="onEditBtnClick('polygon')"><span
+                class="iconfont icon-draw-polygon1"/></div>
+        <div class="edit-btn" title="画矩形" onclick="onEditBtnClick('rectangle')"><span
+                class="iconfont icon-draw-square"/></div>
+        <div class="edit-btn" title="画三角形" onclick="onEditBtnClick('triangle')"><span
+                class="iconfont icon-Triangle"/></div>
+        <div class="edit-btn" title="画圆" onclick="onEditBtnClick('circle')"><span
+                class="iconfont icon-draw-circle"/></div>
+        <div class="edit-btn" title="画扇形" onclick="onEditBtnClick('sector')"><span
+                class="iconfont icon-sector"/></div>
+        <div class="edit-btn" title="画椭圆" onclick="onEditBtnClick('ellipse')"><span
+                class="iconfont icon-ellipse"/></div>
+        <div class="edit-btn" title="合并面" onclick="onEditBtnClick('union_polygon')"><span
+                class="iconfont icon-combine-face"/></div>
+        <div class="edit-btn" title="拆分面" onclick="onEditBtnClick('split_polygon')"><span
+                class="iconfont icon-split-face"/></div>
+    </div>
+    <div class="edit-doc-box">
+        <div class="doc-header">minemap-edit api文档访问地址</div>
+        <div class="doc-desc">https://minedata.cn/minemapapi/v2.1.0/plugins/edit/api.html</div>
+
+        <div class="doc-header">快捷键</div>
+        <div class="doc-desc">多选：“shift/ctrl”+ 点选</div>
+        <div class="doc-desc">框选：“shift”+ 框选</div>
+        <div class="doc-desc">删除：“delete”</div>
+        <div class="doc-desc">结束绘制：“enter”／鼠标左键双击</div>
+        <div class="doc-desc">取消绘制：“esc”</div>
+
+        <div class="doc-header">线编辑</div>
+        <div class="doc-title">1. 绘制线</div>
+        <div class="doc-desc">点击“画线”按钮后，单击地图某处确定线的起点，可以多次再滑动鼠标点击确定线的中间点，最后双击地图完成绘制。</div>
+        <div class="doc-title">2. 绘制圆弧</div>
+        <div class="doc-desc">点击“画圆弧”按钮后，单击地图某处确定圆弧的起点，然后滑动鼠标点击确定圆弧的终点，最后滑动鼠标调整圆弧的弧度，最后单击完成绘制。</div>
+        <div class="doc-title">3. 线合并</div>
+        <div class="doc-desc">选中两条端点相交的线，点击“线合并”按钮，完成线合并。</div>
+        <div class="doc-title">4. 线拆分</div>
+        <div class="doc-desc">选中某条线上要拆分的一个形状点，点击“线拆分”按钮，完成线拆分。</div>
+        <div class="doc-title">5. 弯曲线</div>
+        <div class="doc-desc">选中一条绘制好的折线，点击“弯曲线”按钮，完成线的弯曲。</div>
+        <div class="doc-title">6.添加形状点</div>
+        <div class="doc-desc">双击某一条线要素，会出现新的形状点，点击新形状点即可添加成功。</div>
+        <div class="doc-title">7.画草图</div>
+        <div class="doc-desc">点击“画草图”按钮后，移动鼠标到相应位置，按住鼠标左键后确定草图的起点，然后一直按住鼠标左键滑动鼠标进行草图绘制，最后松开鼠标左键完成绘制。</div>
+
+        <div class="doc-header">面编辑</div>
+        <div class="doc-title">1. 绘制矩形</div>
+        <div class="doc-desc">点击“画矩形”按钮后，单击地图某处确定矩形的起始点，再滑动鼠标调整矩形的范围，最后点击地图完成绘制。</div>
+        <div class="doc-title">2. 绘制三角形</div>
+        <div class="doc-desc">点击“画三角形”按钮后，单击地图某处确定三角的起点，再滑动鼠标确定三角形的中间点，然后滑动鼠标确定三角形的终点，最后点击地图完成绘制。</div>
+        <div class="doc-title">3. 绘制圆</div>
+        <div class="doc-desc">点击“画圆”按钮后，单击地图某处确定圆的中心点，再滑动鼠标调整圆的半径，最后点击地图完成绘制。</div>
+        <div class="doc-desc">已经绘制好的圆形，支持圆的二次编辑功能，选中要再次编辑的圆，点击“画圆”按钮后，此时圆的中心点已经确定，再滑动鼠标调整圆的半径，最后点击地图完成绘制。</div>
+        <div class="doc-title">4. 绘制扇形</div>
+        <div class="doc-desc">点击“画扇形”按钮后，单击地图某处确定扇形的中心点，再滑动鼠标调整扇形的半径并以单击确定，然后滑动鼠标调整扇形的范围，最后点击地图完成绘制。</div>
+        <div class="doc-title">5. 绘制椭圆</div>
+        <div class="doc-desc">点击“画椭圆”按钮后，单击地图某处确定椭圆的起点，然后水平方向滑动鼠标点击确定椭圆的长或短轴长度，最后上下方向滑动鼠标调整椭圆的短或长轴范围，点击地图完成绘制。</div>
+        <div class="doc-title">6. 面合并</div>
+        <div class="doc-desc">选中要合并的两个相交的区域面，点击“面合并”按钮，完成区域面合并。</div>
+        <div class="doc-title">7. 面拆分</div>
+        <div class="doc-desc">选中要拆分的某一个区域面，点击“面拆分”按钮，绘制一条与该区域面相交的线段，完成区域面拆分。</div>
+        <div class="doc-title">8. 添加形状点</div>
+        <div class="doc-desc">双击某一个面要素，会出现新的形状点，点击新形状点即可添加成功。</div>
+    </div>
+</div>
+<script>
+    /* minemap-edit api文档访问地址'https://minedata.cn/minemapapi/v2.1.0/plugins/edit/api.html' */
+
+    /**
+     * 全局参数设置
+     */
+    minemap.domainUrl = 'https://minedata.cn';
+	minemap.dataDomainUrl = ['https://datahive.minedata.cn','https://datahive01.minedata.cn','https://datahive02.minedata.cn','https://datahive03.minedata.cn','https://datahive04.minedata.cn'];
+	minemap.spriteUrl = 'https://minedata.cn/minemapapi/v2.1.0/sprite/sprite';
+	minemap.serviceUrl = 'https://mineservice.minedata.cn/service/';
+
+    minemap.appKey = '16be596e00c44c86bb1569cb53424dc9';
+    minemap.solution = 12877;
+
+    var map = new minemap.Map({
+        container: 'map',
+        style: 'https://mineservice.minedata.cn/service/solu/style/id/12877',
+        center: [116.46,39.92],
+        zoom: 14,
+        pitch: 0,
+        maxZoom: 17,
+        minZoom: 3
+    });
+
+    var edit = new minemap.edit.init(map, {
+        boxSelect: true,
+        touchEnabled: true,
+        displayControlsDefault: true,
+        showButtons: false
+    });
+
+    function onEditBtnClick(mode) {
+        if (edit && mode) {
+            edit.onBtnCtrlActive(mode);
+        }
+    }
+
+    map.on('load', function () {
+        //向编辑池增加数据
+    });
+
+    window.onerror = function (errorMessage, scriptURI, lineNumber, columnNumber, errorObj) {
+        if (scriptURI.indexOf('minemap-edit') > -1) {
+            message.error(errorObj.message);
+        }
+    };
+
+</script>
+</body>
